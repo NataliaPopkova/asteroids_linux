@@ -1,9 +1,10 @@
 #include "Engine.h"
+#include "Laser.h"
 #include "SpaceShip.h"
 // #include "windows.h"
 #include <memory.h>
 #include <stdlib.h>
-#include <chrono>
+#include <vector>
 
 //
 //  You are free to modify this file
@@ -22,6 +23,9 @@
 
 SpaceShip* ship;
 
+Laser* lasers[20];
+int    lasers_num{0};
+
 bool gameOver{false};
 bool gameWon{false};
 int  lives{3};
@@ -34,6 +38,9 @@ void initialize() {
 // this function is called to update game data,
 // dt - time elapsed since the previous update (in seconds)
 void act(float dt) {
+    /// ________________________ Space_ship logic
+    /// _______________________________
+
     if (is_key_pressed(VK_ESCAPE))
         schedule_quit_game();
 
@@ -71,6 +78,39 @@ void act(float dt) {
     if (is_key_pressed(VK_DOWN))
         ship->Explode();
 
+    /// ________________________ Laser logic _______________________________
+
+    if (is_key_pressed(VK_SPACE)) {
+        if (!ship->IsExploded()) {
+            if ((lasers_num < 20) ||
+                (lasers[lasers_num]->GetFireTimeout() > 0.5)) {
+                // If we pressed fire (SPACE key), we create a projectile,
+                // starting from the position of the ship and going in the
+                // direction the ship is faced
+                Laser* laser =
+                    new Laser(ship->GetPosition(), ship->GetRotation());
+                lasers[lasers_num] = laser;
+                lasers_num++;
+            }
+        }
+    }
+
+    for (int i = 0; i < lasers_num; i++) {
+        // Move lasers
+        lasers[i]->Move(dt);
+        if (lasers[i]->IsOut()) {
+            // Eliminate laser from the list if it's outside the screen
+            Laser* laser = lasers[i];
+            for (int j = i; j < lasers_num - 1; j++) {
+                lasers[j] = lasers[j + 1];
+            }
+            lasers[lasers_num - 1] = NULL;
+            delete laser;
+            lasers_num--;
+            i--;
+        }
+    }
+
     if (gameOver == true)
         schedule_quit_game();
 }
@@ -82,9 +122,17 @@ void draw() {
     // clear backbuffer
     memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
     ship->Draw();
+
+    for (int i = 0; i < lasers_num; i++) {
+        lasers[i]->Draw();
+    }
 }
 
 // free game data in this function
 void finalize() {
     ship->~SpaceShip();
+
+    for (int i = 0; i < lasers_num; i++) {
+        lasers[i]->~Laser();
+    }
 }

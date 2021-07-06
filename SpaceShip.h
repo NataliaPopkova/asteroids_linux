@@ -30,6 +30,10 @@ public:
 
     double GetExplosionTime();
 
+    Point2D_d GetPosition();
+    
+    double    GetRotation();
+
     void Reset();
 
 private:

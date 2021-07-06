@@ -80,6 +80,14 @@ double SpaceShip::GetExplosionTime() {
     return explosionTime_;
 };
 
+Point2D_d SpaceShip::GetPosition() {
+    return position_;
+};
+
+double SpaceShip::GetRotation(){
+    return rotation_;
+};
+
 void SpaceShip::ApplyAcceleration(float elapsedTime)
 {
 	// This accellerates the ship forward. We also cap the speed
