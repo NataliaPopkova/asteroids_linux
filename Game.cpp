@@ -23,8 +23,9 @@
 
 SpaceShip* ship;
 
-Laser* lasers[20];
-int    lasers_num{0};
+// Laser* lasers[20];
+std::vector<Laser> lasers;
+int                lasers_num{0};
 
 bool gameOver{false};
 bool gameWon{false};
@@ -38,8 +39,7 @@ void initialize() {
 // this function is called to update game data,
 // dt - time elapsed since the previous update (in seconds)
 void act(float dt) {
-    /// ________________________ Space_ship logic
-    /// _______________________________
+    /// ___________________ Space_ship logic __________________
 
     if (is_key_pressed(VK_ESCAPE))
         schedule_quit_game();
@@ -82,14 +82,16 @@ void act(float dt) {
 
     if (is_key_pressed(VK_SPACE)) {
         if (!ship->IsExploded()) {
-            if ((lasers_num < 20) ||
-                (lasers[lasers_num]->GetFireTimeout() > 0.5)) {
-                // If we pressed fire (SPACE key), we create a projectile,
+            if (lasers_num < 20) {
+                // If we pressed fire (SPACE key), we create a laser,
                 // starting from the position of the ship and going in the
                 // direction the ship is faced
-                Laser* laser =
-                    new Laser(ship->GetPosition(), ship->GetRotation());
-                lasers[lasers_num] = laser;
+
+                // Laser* laser =
+                //     new Laser(ship->GetPosition(), ship->GetRotation());
+                lasers.push_back(
+                    Laser(ship->GetPosition(), ship->GetRotation()));
+                // lasers[lasers_num] = laser;
                 lasers_num++;
             }
         }
@@ -97,15 +99,16 @@ void act(float dt) {
 
     for (int i = 0; i < lasers_num; i++) {
         // Move lasers
-        lasers[i]->Move(dt);
-        if (lasers[i]->IsOut()) {
+        lasers[i].Move(dt);
+        if (lasers[i].IsOut()) {
             // Eliminate laser from the list if it's outside the screen
-            Laser* laser = lasers[i];
-            for (int j = i; j < lasers_num - 1; j++) {
-                lasers[j] = lasers[j + 1];
-            }
-            lasers[lasers_num - 1] = NULL;
-            delete laser;
+            // Laser* laser = lasers[i];
+            // for (int j = i; j < lasers_num - 1; j++) {
+            //     lasers[j] = lasers[j + 1];
+            // }
+            // lasers[lasers_num - 1] = NULL;
+            // delete laser;
+            lasers.erase(lasers.begin() + i);
             lasers_num--;
             i--;
         }
@@ -124,7 +127,7 @@ void draw() {
     ship->Draw();
 
     for (int i = 0; i < lasers_num; i++) {
-        lasers[i]->Draw();
+        lasers[i].Draw();
     }
 }
 
@@ -133,6 +136,6 @@ void finalize() {
     ship->~SpaceShip();
 
     for (int i = 0; i < lasers_num; i++) {
-        lasers[i]->~Laser();
+        lasers[i].~Laser();
     }
 }

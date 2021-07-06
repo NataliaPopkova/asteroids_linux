@@ -1,9 +1,10 @@
 #define _USE_MATH_DEFINES
 
+#include <math.h>
 #include <stdio.h>
 #include <utility>
 #include <vector>
-#include <math.h>
+
 
 #include "SpaceShip.h"
 
@@ -14,41 +15,61 @@ bool SpaceShip::Update() {
     return true;
 };
 
-void SpaceShip::Draw() {
-	if(!exploded_){
-		Point2D headPoint = Point2D(static_cast<uint32_t>(position_.x + 30 * sin(rotation_ * M_PI / 180)),
-			static_cast<uint32_t>(position_.y - 30 * cos(rotation_ * M_PI / 180)));
-		Point2D leftPoint = Point2D(static_cast<uint32_t>(position_.x + 15 * sin((rotation_ - 120) * M_PI / 180)),
-			static_cast<uint32_t>(position_.y - 15 * cos((rotation_ - 120) * M_PI / 180)));
-		Point2D rightPoint = Point2D(static_cast<uint32_t>(position_.x + 15 * sin((rotation_ + 120) * M_PI / 180)),
-			static_cast<uint32_t>(position_.y - 15 * cos((rotation_ + 120) * M_PI / 180)));
+static void rotate(float angle_deg, Point2D_d& point) {
+    float angle = angle_deg * M_PI / 180.;
 
-		drawLine(headPoint, leftPoint, color_);
-		drawLine(leftPoint, rightPoint, color_);
-		drawLine(rightPoint, headPoint, color_);
-	} else {
-		// Explosion mode
+    Point2D_d old = point;
+    point.x       = old.x * cos(angle) - old.y * sin(angle);
+    point.y       = old.x * sin(angle) + old.y * cos(angle);
+}
+
+static void move(const Point2D_d& bias, Point2D_d& point) {
+    point.x = point.x + bias.x;
+    point.y = point.y + bias.y;
+}
+
+void SpaceShip::Draw() {
+    if (!exploded_) {
+        Point2D_d headPoint{0, 30};
+        Point2D_d leftPoint{-15, -15};
+        Point2D_d rightPoint{15, -15};
+
+        rotate(rotation_, headPoint);
+        rotate(rotation_, leftPoint);
+        rotate(rotation_, rightPoint);
+
+        move(position_, headPoint);
+        move(position_, leftPoint);
+        move(position_, rightPoint);
+
+        drawLine_d(headPoint, leftPoint, color_);
+        drawLine_d(leftPoint, rightPoint, color_);
+        drawLine_d(rightPoint, headPoint, color_);
+    } else {
+        // Explosion mode
         int points_num{9};
         int angleStep = 360 / points_num;
         for (int i = 0; i < points_num; i++) {
-            drawCircle(
-				Point2D(static_cast<uint32_t>(position_.x + (explosionTime_ * 120) * sin(i * angleStep * M_PI / 180)),
-						static_cast<uint32_t>(position_.y - (explosionTime_ * 120) * cos(i * angleStep * M_PI / 180))), 4, color_);
+            drawCircle_d(
+                Point2D_d(position_.x - (explosionTime_ * 120) *
+                                            cos(i * angleStep * M_PI / 180),
+
+                          position_.y + (explosionTime_ * 120) *
+                                            sin(i * angleStep * M_PI / 180)),
+                4, color_);
         }
     }
 };
 
-void SpaceShip::Reset()
-{
+void SpaceShip::Reset() {
     // Position in the center of the screen
-    position_.x = SCREEN_HEIGHT / 2;
-    position_.y = SCREEN_WIDTH / 2;
+    position_.x = SCREEN_WIDTH / 2;
+    position_.y = SCREEN_HEIGHT / 2;
 
     // Speed = 0, the ship initially doesn't move
-    speed_.x = 0;
-    speed_.y = 0;
+    speed_ = 0;
 
-    rotation_ = -90;
+    rotation_ = 180;
 
     // The ship is not exploded
     exploded_ = false;
@@ -60,79 +81,67 @@ void SpaceShip::Explode() {
     explosionTime_ = 0;
 }
 
-void SpaceShip::ApplyLeftRotation(float elapsedTime)
-{
-	// Rotates the ship left
-	rotation_ -= elapsedTime * 180;
+void SpaceShip::ApplyLeftRotation(float elapsedTime) {
+    // Rotates the ship left
+    rotation_ -= elapsedTime * 180;
 }
 
-void SpaceShip::ApplyRightRotation(float elapsedTime)
-{
-	// Rotates the ship right
-	rotation_ += elapsedTime * 180;
+void SpaceShip::ApplyRightRotation(float elapsedTime) {
+    // Rotates the ship right
+    rotation_ += elapsedTime * 180;
 }
 
 bool SpaceShip::IsExploded() {
-	return exploded_;
+    return exploded_;
 };
 
 double SpaceShip::GetExplosionTime() {
     return explosionTime_;
 };
 
+void SpaceShip::ApplyAcceleration(float elapsedTime) {
+    speed_ += 0.5;
+    if (speed_ > 3) {
+        speed_ = 3;
+    }
+}
+
+void SpaceShip::Move(float elapsedTime) {
+    if (this->IsExploded()) {
+        explosionTime_ += elapsedTime;
+    } else {
+        if (speed_ == 0) {
+            return;
+        }
+        Point2D_d speed{0, speed_};
+        rotate(rotation_, speed);
+
+        position_.x += speed.x;
+        if (position_.x < 30) {
+            position_.x = SCREEN_WIDTH - 30;
+        }
+        if (position_.x > SCREEN_WIDTH - 30) {
+            position_.x = 30;
+        }
+        position_.y += speed.y;
+        if (position_.y < 30) {
+            position_.y = SCREEN_HEIGHT - 30;
+        }
+        if (position_.y > SCREEN_HEIGHT - 30) {
+            position_.y = 30;
+        }
+
+        speed_ -= 0.1;
+        if (speed_ < 0) {
+            speed_ = 0;
+        }
+    }
+}
+
 Point2D_d SpaceShip::GetPosition() {
     return position_;
 };
 
-double SpaceShip::GetRotation(){
+double SpaceShip::GetRotation() {
     return rotation_;
 };
-
-void SpaceShip::ApplyAcceleration(float elapsedTime)
-{
-	// This accellerates the ship forward. We also cap the speed
-	speed_.x += 250 * elapsedTime * sin(rotation_ * M_PI / 180);
-	if (speed_.x > 100)
-	{
-		speed_.x = 100;
-	}
-	if (speed_.x < -100)
-	{
-		speed_.x = -100;
-	}
-	speed_.y -= 250 * elapsedTime * cos(rotation_ * M_PI / 180);
-	if (speed_.y > 100)
-	{
-		speed_.y = 100;
-	}
-	if (speed_.y < -100)
-	{
-		speed_.y = -100;
-	}
-}
-
-void SpaceShip::Move(float elapsedTime) {
-    // Ship moves according to its speed, and if it goes outside the screen, we pop up on the other side of the screen
-	position_.x += elapsedTime * speed_.x;
-	if (position_.x < -10)
-	{
-		position_.x = SCREEN_HEIGHT + 10;
-	}
-	if (position_.x > SCREEN_HEIGHT + 10)
-	{
-		position_.x = -10;
-	}
-	position_.y += elapsedTime * speed_.y;
-	if (position_.y < -10)
-	{
-		position_.y = SCREEN_WIDTH + 10;
-	}
-	if (position_.y > SCREEN_WIDTH + 10)
-	{
-		position_.y = -10;
-	}
-	if (this->IsExploded())
-	{
-		explosionTime_ += elapsedTime;
-	}
-}

@@ -28,9 +28,9 @@ inline void drawLine(Point2D start, Point2D end, COLOR color) {
     const int signX      = start.x < end.x ? 1 : -1;
     const int signY      = start.y < end.y ? 1 : -1;
     int       error      = deltaX - deltaY;
-    buffer[end.x][end.y] = color;
+    buffer[end.y][end.x] = color;
     while (start.x != end.x || start.y != end.y) {
-        buffer[start.x][start.y] = color;
+        buffer[start.y][start.x] = color;
         int error2               = error * 2;
         if (error2 > -deltaY) {
             error -= deltaY;
@@ -43,16 +43,20 @@ inline void drawLine(Point2D start, Point2D end, COLOR color) {
     }
 };
 
+inline void drawLine_d(Point2D_d start, Point2D_d end, COLOR color) {
+    drawLine({(int)start.x, (int)start.y}, {(int)end.x, (int)end.y}, color);
+}
+
 inline void drawCircle(Point2D center, int radius, COLOR color) {
     int x     = 0;
     int y     = radius;
     int delta = 1 - 2 * radius;
     int error = 0;
     while (y >= 0) {
-        buffer[center.x + x][center.y + y] = color;
-        buffer[center.x + x][center.y - y] = color;
-        buffer[center.x - x][center.y + y] = color;
-        buffer[center.x - x][center.y - y] = color;
+        buffer[center.y + y][center.x + x] = color;
+        buffer[center.y - y][center.x + x] = color;
+        buffer[center.y + y][center.x - x] = color;
+        buffer[center.y - y][center.x - x] = color;
 
         error = 2 * (delta + y) - 1;
         if (delta < 0 && error <= 0) {
@@ -70,4 +74,8 @@ inline void drawCircle(Point2D center, int radius, COLOR color) {
         delta += 2 * (x - y);
         --y;
     }
+}
+
+inline void drawCircle_d(Point2D_d center, int radius, COLOR color) {
+    drawCircle({(int)center.x, (int)center.y}, (int)radius, color);
 }
