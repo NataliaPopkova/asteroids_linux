@@ -81,35 +81,25 @@ void act(float dt) {
     /// ________________________ Laser logic _______________________________
 
     if (is_key_pressed(VK_SPACE)) {
-        if (!ship->IsExploded()) {
-            if (lasers_num < 20) {
-                // If we pressed fire (SPACE key), we create a laser,
-                // starting from the position of the ship and going in the
-                // direction the ship is faced
+        if (lasers.size() == 0) {
+            lasers.push_back(Laser(ship->GetPosition(), ship->GetRotation()));
+        };
 
-                // Laser* laser =
-                //     new Laser(ship->GetPosition(), ship->GetRotation());
+        if (!ship->IsExploded() && (lasers.size() > 0) &&
+            (lasers.back().GetFireTimeout() > 0.2)) {
+            if (lasers.size() < 20) {
                 lasers.push_back(
                     Laser(ship->GetPosition(), ship->GetRotation()));
-                // lasers[lasers_num] = laser;
-                lasers_num++;
             }
         }
     }
 
-    for (int i = 0; i < lasers_num; i++) {
+    for (int i = 0; i < lasers.size(); i++) {
         // Move lasers
         lasers[i].Move(dt);
+
         if (lasers[i].IsOut()) {
-            // Eliminate laser from the list if it's outside the screen
-            // Laser* laser = lasers[i];
-            // for (int j = i; j < lasers_num - 1; j++) {
-            //     lasers[j] = lasers[j + 1];
-            // }
-            // lasers[lasers_num - 1] = NULL;
-            // delete laser;
             lasers.erase(lasers.begin() + i);
-            lasers_num--;
             i--;
         }
     }
@@ -126,7 +116,7 @@ void draw() {
     memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
     ship->Draw();
 
-    for (int i = 0; i < lasers_num; i++) {
+    for (int i = 0; i < lasers.size(); i++) {
         lasers[i].Draw();
     }
 }
@@ -135,7 +125,7 @@ void draw() {
 void finalize() {
     ship->~SpaceShip();
 
-    for (int i = 0; i < lasers_num; i++) {
+    for (int i = 0; i < lasers.size(); i++) {
         lasers[i].~Laser();
     }
 }

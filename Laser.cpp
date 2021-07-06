@@ -16,8 +16,8 @@ void Laser::Move(double elapsedTime) {
 bool Laser::IsOut() {
     // Returns true if the Laser is out of the screen area so we can remove
     // it
-    if (position_.x < -5 || position_.x > SCREEN_WIDTH + 5 ||
-        position_.y < -5 || position_.y > SCREEN_HEIGHT + 5) {
+    if (position_.x < 5 || position_.x > SCREEN_WIDTH - 5 || position_.y < 5 ||
+        position_.y > SCREEN_HEIGHT - 5) {
         return true;
     }
     return false;
