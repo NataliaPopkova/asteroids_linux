@@ -1,9 +1,12 @@
+#include "Asteroid.h"
 #include "Engine.h"
 #include "Laser.h"
 #include "SpaceShip.h"
 // #include "windows.h"
 #include <memory.h>
 #include <stdlib.h>
+#include <chrono>
+#include <random>
 #include <vector>
 
 //
@@ -23,9 +26,8 @@
 
 SpaceShip* ship;
 
-// Laser* lasers[20];
-std::vector<Laser> lasers;
-int                lasers_num{0};
+std::vector<Laser>    lasers;
+std::vector<Asteroid> asteroids;
 
 bool gameOver{false};
 bool gameWon{false};
@@ -33,7 +35,13 @@ int  lives{3};
 
 // initialize game data in this function
 void initialize() {
+    std::srand(std::time(nullptr));
+
     ship = new SpaceShip();
+
+    for (int i = 0; i < 6; i++) {
+        asteroids.push_back(Asteroid());
+    };
 }
 
 // this function is called to update game data,
@@ -104,6 +112,27 @@ void act(float dt) {
         }
     }
 
+    /// ______________________ Asteroids logic _____________________________
+
+    for (int i = 0; i < asteroids.size(); i++) {
+        // Move the asteroids
+        asteroids[i].Move(dt);
+        if (asteroids[i].GetSize() == 0 &&
+            asteroids[i].GetExplosionTime() > 0.5) {
+            // If the asteroid is exploded and 0.5 seconds passed, we remove the
+            // asteroid from the list
+
+            asteroids.erase(asteroids.begin() + i);
+        }
+    }
+
+    if (asteroids.size() == 0) {
+        // You won!
+        gameOver = true;
+        gameWon  = true;
+    }
+
+
     if (gameOver == true)
         schedule_quit_game();
 }
@@ -119,6 +148,10 @@ void draw() {
     for (int i = 0; i < lasers.size(); i++) {
         lasers[i].Draw();
     }
+
+    for (int i = 0; i < asteroids.size(); i++) {
+        asteroids[i].Draw();
+    }
 }
 
 // free game data in this function
@@ -127,5 +160,9 @@ void finalize() {
 
     for (int i = 0; i < lasers.size(); i++) {
         lasers[i].~Laser();
+    }
+
+    for (int i = 0; i < asteroids.size(); i++) {
+        asteroids[i].~Asteroid();
     }
 }

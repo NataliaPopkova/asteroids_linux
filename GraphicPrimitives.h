@@ -1,7 +1,6 @@
 #pragma once
 
 #include <math.h>
-#include <stdio.h>
 #include "Engine.h"
 
 enum COLOR { BLUE = 0x0000ff, RED = 0xff0000, GREEN = 0x00ff00 };

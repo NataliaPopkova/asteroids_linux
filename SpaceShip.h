@@ -2,7 +2,6 @@
 
 #include "GraphicPrimitives.h"
 
-
 class SpaceShip {
 public:
     SpaceShip() = default;
@@ -37,7 +36,7 @@ public:
     void Reset();
 
 private:
-    COLOR color_{COLOR::BLUE};
+    COLOR color_{COLOR::GREEN};
 
     Point2D_d position_{Point2D_d(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)};
     double    speed_{0};
