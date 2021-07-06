@@ -15,19 +15,6 @@ bool SpaceShip::Update() {
     return true;
 };
 
-static void rotate(float angle_deg, Point2D_d& point) {
-    float angle = angle_deg * M_PI / 180.;
-
-    Point2D_d old = point;
-    point.x       = old.x * cos(angle) - old.y * sin(angle);
-    point.y       = old.x * sin(angle) + old.y * cos(angle);
-}
-
-static void move(const Point2D_d& bias, Point2D_d& point) {
-    point.x = point.x + bias.x;
-    point.y = point.y + bias.y;
-}
-
 void SpaceShip::Draw() {
     if (!exploded_) {
         Point2D_d headPoint{0, 30};
