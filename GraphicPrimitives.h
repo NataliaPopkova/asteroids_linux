@@ -1,6 +1,10 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
+
 #include <math.h>
+#include <string>
+#include <vector>
 #include "Engine.h"
 
 enum COLOR { BLUE = 0x0000ff, RED = 0xff0000, GREEN = 0x00ff00 };
@@ -57,6 +61,38 @@ inline void drawLine(Point2D start, Point2D end, COLOR color) {
 
 inline void drawLine_d(Point2D_d start, Point2D_d end, COLOR color) {
     drawLine({(int)start.x, (int)start.y}, {(int)end.x, (int)end.y}, color);
+}
+
+/*
+    draws a regular polygon
+*/
+inline void drawPolygonal(Point2D_d center, double size, int anglesNum,
+                          COLOR color) {
+    std::vector<Point2D_d> points;
+    Point2D_d              bias(size, size);
+    double                 angleStep = 360. / anglesNum;
+    Point2D_d              point(center);
+    Point2D_d              _center(-center.x, -center.y);
+
+    move(_center, point);
+    move(bias, point);
+    rotate(0, point);
+    move(center, point);
+
+    points.push_back(point);
+
+    for (int i = 1; i < anglesNum; i++) {
+        Point2D_d point1(center);
+        move(_center, point1);
+        move(bias, point1);
+        rotate(angleStep * i, point1);
+        move(center, point1);
+
+        points.push_back(point1);
+        drawLine_d(points[i - 1], points[i], color);
+    };
+
+    drawLine_d(points[anglesNum - 1], points[0], color);
 }
 
 inline void drawCircle(Point2D center, int radius, COLOR color) {

@@ -2,11 +2,9 @@
 
 #include "GraphicPrimitives.h"
 
-#define ASTEROID_SPEED           5
-#define ASTEROID_MAX_ROTATION    90
-#define ASTEROID_SIZE_MULTIPLIER 5
-#define ASTEROID_SIZE_VARIATION  10
-#define ASTEROID_CORNERS         9
+#define ASTEROID_SPEED        15
+#define ASTEROID_MAX_ROTATION 90
+#define ASTEROID_CORNERS      9
 
 class Asteroid {
 public:
@@ -26,13 +24,13 @@ public:
 
 private:
     Point2D_d position_;
-    double    speed_;
+    double    speed_{ASTEROID_SPEED};
 
-    int    size_;
-    double explosionTime_;
-    double rotation_;
-    double rotationSpeed_;
-    double initial_rotationAngle_;
+    double size_{5};
+    double explosionTime_{0};
+    double rotation_{0};
+    double rotationSpeed_{0};
+    double initial_rotationAngle_{0};
 
     Point2D_d speed{0, speed_};
 

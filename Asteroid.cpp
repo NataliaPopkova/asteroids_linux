@@ -1,17 +1,18 @@
 #define _USE_MATH_DEFINES
 
 #include <math.h>
+#include <stdlib.h>
 
 #include "Asteroid.h"
 
+static inline double random(double min, double max) {
+    return (double)(rand()) / RAND_MAX * (max - min) + min;
+}
 
 Asteroid::Asteroid() {
     // Initialize position_ randomly on the screen
-    // position_.x = rand() % SCREEN_WIDTH;
-    // position_.y = rand() % SCREEN_HEIGHT;
-
-    position_.x = SCREEN_WIDTH / 2;
-    position_.y = SCREEN_HEIGHT / 2;
+    position_.x = rand() % SCREEN_WIDTH;
+    position_.y = rand() % SCREEN_HEIGHT;
 
     // Initialize fixed speed_ in a random direction
     initial_rotationAngle_ = rand() % 360;
@@ -20,31 +21,14 @@ Asteroid::Asteroid() {
 
     // Initial size_ : 4
     size_ = 4;
-
-    // Initializes a random rotation speed_
-    rotation_ = 0;
-    rotationSpeed_ =
-        rand() % ASTEROID_MAX_ROTATION - (ASTEROID_MAX_ROTATION / 2);
-
-    // Generates random shape of the asteroid
-    int variation = ASTEROID_SIZE_VARIATION * size_ / 4;
-    for (int i = 0; i < ASTEROID_CORNERS; i++) {
-        sizeVariation[i] = rand() % variation - (variation / 2.0);
-    }
 }
 
 Asteroid::Asteroid(Point2D_d newPosition, int newSize, double newSpeed)
         : position_(newPosition), speed_(newSpeed), size_(newSize) {
     // Initializes a random rotation speed
-    rotation_ = 0;
-    rotationSpeed_ =
-        rand() % ASTEROID_MAX_ROTATION - (ASTEROID_MAX_ROTATION / 2);
-
-    // Generates random shape of the asteroid
-    int variation = ASTEROID_SIZE_VARIATION * size_ / 4;
-    for (int i = 0; i < ASTEROID_CORNERS; i++) {
-        sizeVariation[i] = rand() % variation - (variation / 2.0);
-    }
+    rotation_      = 0;
+    rotationSpeed_ = random(ASTEROID_MAX_ROTATION / 2, ASTEROID_MAX_ROTATION);
+    // rand() % ASTEROID_MAX_ROTATION - (ASTEROID_MAX_ROTATION / 2);
 }
 
 void Asteroid::Move(double elapsedTime) {
@@ -56,18 +40,18 @@ void Asteroid::Move(double elapsedTime) {
         rotate(rotation_, speed);
 
         position_.x += speed.x;
-        if (position_.x < 10) {
-            position_.x = SCREEN_WIDTH - 10;
+        if (position_.x < size_ * 2) {
+            position_.x = SCREEN_WIDTH - size_ * 2;
         }
-        if (position_.x > SCREEN_WIDTH - 10) {
-            position_.x = 10;
+        if (position_.x > SCREEN_WIDTH - size_ * 2) {
+            position_.x = size_ * 2;
         }
         position_.y += speed.y;
-        if (position_.y < 10) {
-            position_.y = SCREEN_HEIGHT - 10;
+        if (position_.y < size_ * 2) {
+            position_.y = SCREEN_HEIGHT - size_ * 2;
         }
-        if (position_.y > SCREEN_HEIGHT - 10) {
-            position_.y = 10;
+        if (position_.y > SCREEN_HEIGHT - size_ * 2) {
+            position_.y = size_ * 2;
         }
         // We also rotate it
         rotation_ += rotationSpeed_ * elapsedTime;
@@ -86,23 +70,8 @@ void Asteroid::Explode() {
 
 void Asteroid::Draw() {
     if (size_ > 0) {
-        int       angleStep = 360 / ASTEROID_CORNERS;
-        Point2D_d points[angleStep];
-        for (int i = 1; i < ASTEROID_CORNERS; i++) {
-            points[i - 1] = Point2D_d(position_.x, position_.y);
-            Point2D_d bias(size_ * ASTEROID_SIZE_MULTIPLIER + sizeVariation[i],
-                           size_ * ASTEROID_SIZE_MULTIPLIER + sizeVariation[i]);
-            move(bias, points[i - 1]);
-            rotate(rotation_ + i * angleStep, points[i - 1]);
+        drawPolygonal(position_, size_, 6, color_);
 
-            if (i > 1) {
-                drawLine_d(points[i - 1], points[i], color_);
-            }
-
-            if (i == ASTEROID_CORNERS - 1) {
-                drawLine_d(points[ASTEROID_CORNERS - 1], points[0], color_);
-            }
-        }
         // If it's not exploded, we draw the asteroid's shape
     } else {
         // In case of an explosion, we draw 9 points moving away from the center
