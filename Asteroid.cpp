@@ -18,7 +18,7 @@ Asteroid::Asteroid() {
     initial_rotationAngle_ = rand() % 360;
     rotate(initial_rotationAngle_, speed);
 
-    size_ = random(15, 20);
+    // size_ = random(ASTEROID_MAX_SIZE * (3 / 4), ASTEROID_MAX_SIZE);
 }
 
 Asteroid::Asteroid(Point2D_d newPosition, int newSize, double newSpeed)
@@ -65,8 +65,7 @@ void Asteroid::Explode() {
 
 void Asteroid::Draw() {
     if (size_ > 0) {
-        drawPolygonal_d(position_, size_, 6, color_);
-
+        drawPolygonal_d(position_, size_, (int)random(5, 10), color_);
         // If it's not exploded, we draw the asteroid's shape
     } else {
         // In case of an explosion, we draw 9 points moving away from the center

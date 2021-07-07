@@ -69,14 +69,6 @@ void draw() {
 // free game data in this function
 void finalize() {
     ship->~SpaceShip();
-
-    for (int i = 0; i < lasers.size(); i++) {
-        lasers[i].~Laser();
-    }
-
-    for (int i = 0; i < asteroids.size(); i++) {
-        asteroids[i].~Asteroid();
-    }
 }
 
 void laser_logic(float dt) {
@@ -173,49 +165,47 @@ void asteroids_laser_collision_logic(float dt) {
             if (!foundCollision)  // One collision detection per frame is enough
             {
                 // Distance between the center of the asteroid and laser
-                double distance = pow(asteroids.at(i).GetPosition().x -
-                                          lasers.at(j).GetPosition().x,
-                                      2) +
-                                  pow(asteroids.at(i).GetPosition().y -
-                                          lasers.at(j).GetPosition().y,
-                                      2);
+                double distance = sqrt(pow(asteroids[i].GetPosition().x -
+                                               lasers[j].GetPosition().x,
+                                           2) +
+                                       pow(asteroids[i].GetPosition().y -
+                                               lasers[j].GetPosition().y,
+                                           2));
                 // Size of the asteroid
-                double size = asteroids.at(i).GetSize();
+                double size = asteroids[i].GetSize();
 
                 if (distance < size) {  // We have a collision
-
-                    // Eliminate laser
+                    // Remove laser
                     lasers.erase(lasers.begin() + j);
 
                     // Explode asteroid and create 2 new if needed
-                    if (asteroids.at(i).GetSize() > 1) {
+                    if (asteroids[i].GetSize() > ASTEROID_MIN_SIZE) {
                         // If the asteroid's size is higher than 1, we can split
                         // it into 2 That means creating 2 smaller asteroids and
                         // removing this one
                         Point2D_d cSpeed =
-                            Point2D_d(0, asteroids.at(i).GetSpeed());
-                        double speed1(asteroids.at(i).GetSpeed());
+                            Point2D_d(0, asteroids[i].GetSpeed());
+                        double speed1(asteroids[i].GetSpeed());
 
                         // New asteroid 1
-
-                        Asteroid newAsteroid1(asteroids.at(i).GetPosition(),
-                                              asteroids.at(i).GetSize() / 2,
+                        Asteroid newAsteroid1(asteroids[i].GetPosition(),
+                                              asteroids[i].GetSize() / 2,
                                               speed1);
                         asteroids.push_back(newAsteroid1);
 
                         // New asteroid 2
-
-                        double   speed2(-asteroids.at(i).GetSpeed());
-                        Asteroid newAsteroid2(asteroids.at(i).GetPosition(),
-                                              asteroids.at(i).GetSize() / 2,
+                        double   speed2(-asteroids[i].GetSpeed());
+                        Asteroid newAsteroid2(asteroids[i].GetPosition(),
+                                              asteroids[i].GetSize() / 2,
                                               speed2);
                         asteroids.push_back(newAsteroid2);
 
                         // Remove old asteroid
                         asteroids.erase(asteroids.begin() + i);
                     } else {
-                        // If atseroid size was 1, we set it to explosion mode
-                        asteroids.at(i).Explode();
+                        // If atseroid size was ASTEROID_MIN_SIZE, we set it to
+                        // explosion mode
+                        asteroids[i].Explode();
                     }
 
                     foundCollision = true;
