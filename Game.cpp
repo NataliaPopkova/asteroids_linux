@@ -9,20 +9,6 @@
 #include <random>
 #include <vector>
 
-//
-//  You are free to modify this file
-//
-
-//  is_key_pressed(int button_vk_code) - check if a key is pressed,
-//                                       use keycodes (VK_SPACE, VK_RIGHT,
-//                                       VK_LEFT, VK_UP, VK_DOWN, 'A', 'B')
-//
-//  get_cursor_x(), get_cursor_y() - get mouse cursor position
-//  is_mouse_button_pressed(int button) - check if mouse button is pressed (0 -
-//  left button, 1 - right button) clear_buffer() - set all pixels in buffer to
-//  'black' is_window_active() - returns true if window is active
-//  schedule_quit_game() - quit game after act()
-
 
 SpaceShip* ship;
 
@@ -32,6 +18,13 @@ std::vector<Asteroid> asteroids;
 bool gameOver{false};
 bool gameWon{false};
 int  lives{3};
+
+void laser_logic(float dt);
+void spaceShip_logic(float dt);
+void lasers_logic(float dt);
+void asteroids_logic(float dt);
+void asteroids_laser_collision_logic(float dt);
+
 
 // initialize game data in this function
 void initialize() {
@@ -47,8 +40,72 @@ void initialize() {
 // this function is called to update game data,
 // dt - time elapsed since the previous update (in seconds)
 void act(float dt) {
-    /// ___________________ Space_ship logic __________________
+    if (is_key_pressed(VK_DOWN))
+        asteroids.back().Explode();
 
+    spaceShip_logic(dt);
+
+    laser_logic(dt);
+
+    asteroids_logic(dt);
+
+    asteroids_laser_collision_logic(dt);
+}
+
+void draw() {
+    // clear backbuffer
+    memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
+    ship->Draw();
+
+    for (int i = 0; i < lasers.size(); i++) {
+        lasers[i].Draw();
+    }
+
+    for (int i = 0; i < asteroids.size(); i++) {
+        asteroids[i].Draw();
+    }
+}
+
+// free game data in this function
+void finalize() {
+    ship->~SpaceShip();
+
+    for (int i = 0; i < lasers.size(); i++) {
+        lasers[i].~Laser();
+    }
+
+    for (int i = 0; i < asteroids.size(); i++) {
+        asteroids[i].~Asteroid();
+    }
+}
+
+void laser_logic(float dt) {
+    if (is_key_pressed(VK_SPACE)) {
+        if (lasers.size() == 0) {
+            lasers.push_back(Laser(ship->GetPosition(), ship->GetRotation()));
+        };
+
+        if (!ship->IsExploded() && (lasers.size() > 0) &&
+            (lasers.back().GetFireTimeout() > 0.2)) {
+            if (lasers.size() < 20) {
+                lasers.push_back(
+                    Laser(ship->GetPosition(), ship->GetRotation()));
+            }
+        }
+    }
+
+    for (int i = 0; i < lasers.size(); i++) {
+        // Move lasers
+        lasers[i].Move(dt);
+
+        if (lasers[i].IsOut()) {
+            lasers.erase(lasers.begin() + i);
+            i--;
+        }
+    }
+}
+
+void spaceShip_logic(float dt) {
     if (is_key_pressed(VK_ESCAPE))
         schedule_quit_game();
 
@@ -82,38 +139,9 @@ void act(float dt) {
             gameWon  = false;
         }
     }
+}
 
-    if (is_key_pressed(VK_DOWN))
-        asteroids.back().Explode();
-
-    /// ________________________ Laser logic _______________________________
-
-    if (is_key_pressed(VK_SPACE)) {
-        if (lasers.size() == 0) {
-            lasers.push_back(Laser(ship->GetPosition(), ship->GetRotation()));
-        };
-
-        if (!ship->IsExploded() && (lasers.size() > 0) &&
-            (lasers.back().GetFireTimeout() > 0.2)) {
-            if (lasers.size() < 20) {
-                lasers.push_back(
-                    Laser(ship->GetPosition(), ship->GetRotation()));
-            }
-        }
-    }
-
-    for (int i = 0; i < lasers.size(); i++) {
-        // Move lasers
-        lasers[i].Move(dt);
-
-        if (lasers[i].IsOut()) {
-            lasers.erase(lasers.begin() + i);
-            i--;
-        }
-    }
-
-    /// ______________________ Asteroids logic _____________________________
-
+void asteroids_logic(float dt) {
     for (int i = 0; i < asteroids.size(); i++) {
         // Move the asteroids
         asteroids[i].Move(dt);
@@ -132,8 +160,11 @@ void act(float dt) {
         gameWon  = true;
     }
 
-    /// ______________________ Collisions logic _____________________________
+    if (gameOver == true)
+        schedule_quit_game();
+}
 
+void asteroids_laser_collision_logic(float dt) {
     // Laser to asteroid collisions
     bool foundCollision = false;
     // We go through each asteroid and laser to check for collisions
@@ -191,39 +222,5 @@ void act(float dt) {
                 }
             }
         }
-    }
-    ///_______________________________________________________________________
-
-    if (gameOver == true)
-        schedule_quit_game();
-}
-
-// fill buffer in this function
-// uint32_t buffer[SCREEN_HEIGHT][SCREEN_WIDTH] - is an array of 32-bit
-// colors (8 bits per R, G, B)
-void draw() {
-    // clear backbuffer
-    memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
-    ship->Draw();
-
-    for (int i = 0; i < lasers.size(); i++) {
-        lasers[i].Draw();
-    }
-
-    for (int i = 0; i < asteroids.size(); i++) {
-        asteroids[i].Draw();
-    }
-}
-
-// free game data in this function
-void finalize() {
-    ship->~SpaceShip();
-
-    for (int i = 0; i < lasers.size(); i++) {
-        lasers[i].~Laser();
-    }
-
-    for (int i = 0; i < asteroids.size(); i++) {
-        asteroids[i].~Asteroid();
     }
 }
