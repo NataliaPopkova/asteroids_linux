@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Asteroid.h"
 #include "Engine.h"
 #include "Laser.h"

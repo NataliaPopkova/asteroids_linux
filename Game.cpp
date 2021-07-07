@@ -1,14 +1,5 @@
-#include "Asteroid.h"
-#include "Engine.h"
-#include "Laser.h"
 #include "Logic.h"
-#include "SpaceShip.h"
-// #include "windows.h"
-#include <memory.h>
-#include <stdlib.h>
-#include <chrono>
-#include <random>
-#include <vector>
+#include "MessageDraw.h"
 
 
 // initialize game data in this function
@@ -41,6 +32,9 @@ void act(float dt) {
     asteroids_laser_collision_logic(dt);
 
     asteroid_ship_collision_logic(dt);
+
+    if (gameOver == true)
+        drawWin();
 }
 
 void draw() {
