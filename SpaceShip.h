@@ -6,8 +6,7 @@ class SpaceShip {
 public:
     SpaceShip() = default;
 
-    SpaceShip(Point2D_d position, Point2D_d speed)
-            : position_{position}, speed_{0} {};
+    SpaceShip(int lifeNo);
 
     ~SpaceShip() = default;
 

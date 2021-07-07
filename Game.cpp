@@ -12,8 +12,9 @@
 
 SpaceShip* ship;
 
-std::vector<Laser>    lasers;
-std::vector<Asteroid> asteroids;
+std::vector<Laser>     lasers;
+std::vector<Asteroid>  asteroids;
+std::vector<SpaceShip> lifeShips;
 
 bool gameOver{false};
 bool gameWon{false};
@@ -40,6 +41,10 @@ void initialize() {
     for (int i = 0; i < asteroids_n; i++) {
         asteroids.push_back(Asteroid());
     };
+
+    for (int i = 0; i < lives; i++) {
+        lifeShips.push_back(SpaceShip(i));
+    }
 }
 
 // this function is called to update game data,
@@ -70,6 +75,10 @@ void draw() {
 
     for (int i = 0; i < asteroids.size(); i++) {
         asteroids[i].Draw();
+    }
+
+    for (int i = 0; i < lifeShips.size(); i++) {
+        lifeShips[i].Draw();
     }
 }
 
@@ -132,6 +141,7 @@ void spaceShip_logic(float dt) {
         // decrease the lives.
         ship->Reset();
         lives--;
+        lifeShips.pop_back();
         if (lives == 0) {
             // Game Over
             gameOver = true;

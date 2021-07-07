@@ -4,6 +4,16 @@
 
 #include "SpaceShip.h"
 
+SpaceShip::SpaceShip(int lifeNo) {
+    // "lives" ships, just to display the number of lives
+    // left in the corner of the screen
+    Reset();
+
+    // Sets position in the corner of the screen
+    position_.x = 30 + lifeNo * 30;
+    position_.y = 40;
+}
+
 void SpaceShip::Draw() {
     if (!exploded_) {
         Point2D_d headPoint{0, size_};
