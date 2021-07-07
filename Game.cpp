@@ -84,7 +84,7 @@ void act(float dt) {
     }
 
     if (is_key_pressed(VK_DOWN))
-        ship->Explode();
+        asteroids.back().Explode();
 
     /// ________________________ Laser logic _______________________________
 

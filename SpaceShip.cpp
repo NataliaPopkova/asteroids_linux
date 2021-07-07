@@ -4,18 +4,11 @@
 
 #include "SpaceShip.h"
 
-bool SpaceShip::Update() {
-    // erase area
-    // Draw() callout
-
-    return true;
-};
-
 void SpaceShip::Draw() {
     if (!exploded_) {
-        Point2D_d headPoint{0, 30};
-        Point2D_d leftPoint{-15, -15};
-        Point2D_d rightPoint{15, -15};
+        Point2D_d headPoint{0, size_};
+        Point2D_d leftPoint{-size_ / 2, -size_ / 2};
+        Point2D_d rightPoint{size_ / 2, -size_ / 2};
 
         rotate(rotation_, headPoint);
         rotate(rotation_, leftPoint);
@@ -100,18 +93,18 @@ void SpaceShip::Move(float elapsedTime) {
         rotate(rotation_, speed);
 
         position_.x += speed.x;
-        if (position_.x < 30) {
-            position_.x = SCREEN_WIDTH - 30;
+        if (position_.x < size_) {
+            position_.x = SCREEN_WIDTH - size_;
         }
-        if (position_.x > SCREEN_WIDTH - 30) {
-            position_.x = 30;
+        if (position_.x > SCREEN_WIDTH - size_) {
+            position_.x = size_;
         }
         position_.y += speed.y;
-        if (position_.y < 30) {
-            position_.y = SCREEN_HEIGHT - 30;
+        if (position_.y < size_) {
+            position_.y = SCREEN_HEIGHT - size_;
         }
-        if (position_.y > SCREEN_HEIGHT - 30) {
-            position_.y = 30;
+        if (position_.y > SCREEN_HEIGHT - size_) {
+            position_.y = size_;
         }
 
         speed_ -= 0.1;

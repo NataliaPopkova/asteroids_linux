@@ -11,8 +11,6 @@ public:
 
     ~SpaceShip() = default;
 
-    bool Update();
-
     void Draw();
 
     void ApplyLeftRotation(float elapsedTime);
@@ -41,7 +39,8 @@ private:
     Point2D_d position_{Point2D_d(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)};
     double    speed_{0};
     double    rotation_{180};
-    int       hp_;
+    double    size_{30};
+    int       hp_{3};
 
     bool   exploded_{false};
     double explosionTime_;

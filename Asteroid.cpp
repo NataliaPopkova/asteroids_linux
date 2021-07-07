@@ -16,19 +16,18 @@ Asteroid::Asteroid() {
 
     // Initialize fixed speed_ in a random direction
     initial_rotationAngle_ = rand() % 360;
-
     rotate(initial_rotationAngle_, speed);
 
-    // Initial size_ : 4
-    size_ = 4;
+    size_ = random(15, 20);
 }
 
 Asteroid::Asteroid(Point2D_d newPosition, int newSize, double newSpeed)
         : position_(newPosition), speed_(newSpeed), size_(newSize) {
     // Initializes a random rotation speed
-    rotation_      = 0;
-    rotationSpeed_ = random(ASTEROID_MAX_ROTATION / 2, ASTEROID_MAX_ROTATION);
-    // rand() % ASTEROID_MAX_ROTATION - (ASTEROID_MAX_ROTATION / 2);
+
+    // Initialize fixed speed_ in a random direction
+    initial_rotationAngle_ = rand() % 360;
+    rotate(initial_rotationAngle_, speed);
 }
 
 void Asteroid::Move(double elapsedTime) {
@@ -37,8 +36,6 @@ void Asteroid::Move(double elapsedTime) {
     if (size_ > 0) {
         // We move it around, and if it goes outside the screen, we make it pop
         // up on the other side;
-        rotate(rotation_, speed);
-
         position_.x += speed.x;
         if (position_.x < size_ * 2) {
             position_.x = SCREEN_WIDTH - size_ * 2;
@@ -53,8 +50,6 @@ void Asteroid::Move(double elapsedTime) {
         if (position_.y > SCREEN_HEIGHT - size_ * 2) {
             position_.y = size_ * 2;
         }
-        // We also rotate it
-        rotation_ += rotationSpeed_ * elapsedTime;
     } else {
         // We use explosionTime_ to generate a visual explosion and remove it
         // after 0.5 seconds
@@ -70,7 +65,7 @@ void Asteroid::Explode() {
 
 void Asteroid::Draw() {
     if (size_ > 0) {
-        drawPolygonal(position_, size_, 6, color_);
+        drawPolygonal_d(position_, size_, 6, color_);
 
         // If it's not exploded, we draw the asteroid's shape
     } else {
@@ -78,12 +73,11 @@ void Asteroid::Draw() {
         int angleStep = 360 / ASTEROID_CORNERS;
         for (int i = 0; i < ASTEROID_CORNERS; i++) {
             drawCircle_d(
-                Point2D_d(position_.x +
-                              (explosionTime_ * (100 + 20 * sizeVariation[i])) *
-                                  sin(i * angleStep * M_PI / 180),
-                          position_.y -
-                              (explosionTime_ * (100 + 20 * sizeVariation[i])) *
-                                  cos(i * angleStep * M_PI / 180)),
+                Point2D_d(position_.x - (explosionTime_ * 120) *
+                                            cos(i * angleStep * M_PI / 180),
+
+                          position_.y + (explosionTime_ * 120) *
+                                            sin(i * angleStep * M_PI / 180)),
                 4, color_);
         }
     }

@@ -3,7 +3,6 @@
 #define _USE_MATH_DEFINES
 
 #include <math.h>
-#include <string>
 #include <vector>
 #include "Engine.h"
 
@@ -39,15 +38,21 @@ static void move(const Point2D_d& bias, Point2D_d& point) {
     Bresenham's line algorithm
 */
 inline void drawLine(Point2D start, Point2D end, COLOR color) {
-    const int deltaX     = abs(end.x - start.x);
-    const int deltaY     = abs(end.y - start.y);
-    const int signX      = start.x < end.x ? 1 : -1;
-    const int signY      = start.y < end.y ? 1 : -1;
-    int       error      = deltaX - deltaY;
-    buffer[end.y][end.x] = color;
+    const int deltaX = abs(end.x - start.x);
+    const int deltaY = abs(end.y - start.y);
+    const int signX  = start.x < end.x ? 1 : -1;
+    const int signY  = start.y < end.y ? 1 : -1;
+    int       error  = deltaX - deltaY;
+    if ((end.y > 0) && (end.y < SCREEN_HEIGHT) && (end.x > 0) &&
+        (end.x < SCREEN_WIDTH)) {
+        buffer[end.y][end.x] = color;
+    }
     while (start.x != end.x || start.y != end.y) {
-        buffer[start.y][start.x] = color;
-        int error2               = error * 2;
+        if ((start.y > 0) && (start.y < SCREEN_HEIGHT) && (start.x > 0) &&
+            (start.x < SCREEN_WIDTH)) {
+            buffer[start.y][start.x] = color;
+        }
+        int error2 = error * 2;
         if (error2 > -deltaY) {
             error -= deltaY;
             start.x += signX;
@@ -66,7 +71,7 @@ inline void drawLine_d(Point2D_d start, Point2D_d end, COLOR color) {
 /*
     draws a regular polygon
 */
-inline void drawPolygonal(Point2D_d center, double size, int anglesNum,
+inline void drawPolygonal_d(Point2D_d center, double size, int anglesNum,
                           COLOR color) {
     std::vector<Point2D_d> points;
     Point2D_d              bias(size, size);
@@ -101,10 +106,14 @@ inline void drawCircle(Point2D center, int radius, COLOR color) {
     int delta = 1 - 2 * radius;
     int error = 0;
     while (y >= 0) {
-        buffer[center.y + y][center.x + x] = color;
-        buffer[center.y - y][center.x + x] = color;
-        buffer[center.y + y][center.x - x] = color;
-        buffer[center.y - y][center.x - x] = color;
+        if ((center.y + y > radius) &&
+            (center.y + y < SCREEN_HEIGHT - radius) &&
+            (center.x + x > radius) && (center.x + x < SCREEN_WIDTH - radius)) {
+            buffer[center.y + y][center.x + x] = color;
+            buffer[center.y - y][center.x + x] = color;
+            buffer[center.y + y][center.x - x] = color;
+            buffer[center.y - y][center.x - x] = color;
+        }
 
         error = 2 * (delta + y) - 1;
         if (delta < 0 && error <= 0) {
