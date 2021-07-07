@@ -5,7 +5,7 @@
 #define ASTEROID_SPEED    5
 #define ASTEROID_CORNERS  9
 #define ASTEROID_MAX_SIZE 40
-#define ASTEROID_MIN_SIZE 5
+#define ASTEROID_MIN_SIZE 15
 
 class Asteroid {
 public:

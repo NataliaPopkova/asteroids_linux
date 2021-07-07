@@ -31,6 +31,8 @@ public:
 
     double GetRotation();
 
+    double GetSize();
+
     void Reset();
 
 private:
@@ -40,7 +42,6 @@ private:
     double    speed_{0};
     double    rotation_{180};
     double    size_{30};
-    int       hp_{3};
 
     bool   exploded_{false};
     double explosionTime_;

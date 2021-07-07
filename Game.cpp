@@ -18,12 +18,14 @@ std::vector<Asteroid> asteroids;
 bool gameOver{false};
 bool gameWon{false};
 int  lives{3};
+int  asteroids_n{6};
 
 void laser_logic(float dt);
 void spaceShip_logic(float dt);
 void lasers_logic(float dt);
 void asteroids_logic(float dt);
 void asteroids_laser_collision_logic(float dt);
+void asteroid_ship_collision_logic(float dt);
 
 
 // initialize game data in this function
@@ -32,7 +34,10 @@ void initialize() {
 
     ship = new SpaceShip();
 
-    for (int i = 0; i < 6; i++) {
+    asteroids.reserve(100);
+    lasers.reserve(50);
+
+    for (int i = 0; i < asteroids_n; i++) {
         asteroids.push_back(Asteroid());
     };
 }
@@ -50,6 +55,8 @@ void act(float dt) {
     asteroids_logic(dt);
 
     asteroids_laser_collision_logic(dt);
+
+    asteroid_ship_collision_logic(dt);
 }
 
 void draw() {
@@ -141,7 +148,6 @@ void asteroids_logic(float dt) {
             asteroids[i].GetExplosionTime() > 0.5) {
             // If the asteroid is exploded and 0.5 seconds passed, we remove the
             // asteroid from the list
-
             asteroids.erase(asteroids.begin() + i);
         }
     }
@@ -157,8 +163,7 @@ void asteroids_logic(float dt) {
 }
 
 void asteroids_laser_collision_logic(float dt) {
-    // Laser to asteroid collisions
-    bool foundCollision = false;
+    bool foundCollision{false};
     // We go through each asteroid and laser to check for collisions
     for (int i = 0; i < asteroids.size(); i++) {
         for (int j = 0; j < lasers.size(); j++) {
@@ -207,6 +212,35 @@ void asteroids_laser_collision_logic(float dt) {
                         // explosion mode
                         asteroids[i].Explode();
                     }
+
+                    foundCollision = true;
+                }
+            }
+        }
+    }
+}
+
+void asteroid_ship_collision_logic(float dt) {
+    bool foundCollision{false};
+    if (!ship->IsExploded()) {
+        foundCollision = false;
+        // We go through all the steroids
+        for (int i = 0; i < asteroids.size(); i++) {
+            if (!foundCollision)  // One collision per frame is enough
+            {
+                // Distance between ship's and asteroid's centers
+                double distance = sqrt(
+                    pow(asteroids[i].GetPosition().x - ship->GetPosition().x,
+                        2) +
+                    pow(asteroids[i].GetPosition().y - ship->GetPosition().y,
+                        2));
+                // Asteroid's size + ship's size
+                double size = asteroids[i].GetSize() / 2 + ship->GetSize();
+
+                // If we have a collision
+                if (distance < size) {
+                    // Ship explosion
+                    ship->Explode();
 
                     foundCollision = true;
                 }

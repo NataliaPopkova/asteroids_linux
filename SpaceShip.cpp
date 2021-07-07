@@ -82,6 +82,10 @@ void SpaceShip::ApplyAcceleration(float elapsedTime) {
     }
 }
 
+double SpaceShip::GetSize() {
+    return size_;
+}
+
 void SpaceShip::Move(float elapsedTime) {
     if (this->IsExploded()) {
         explosionTime_ += elapsedTime;
