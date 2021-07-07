@@ -2,7 +2,7 @@
 
 #include "GraphicPrimitives.h"
 
-#define LASER_SPEED 5
+#define LASER_SPEED 10
 
 class Laser {
 public:

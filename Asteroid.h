@@ -2,7 +2,7 @@
 
 #include "GraphicPrimitives.h"
 
-#define ASTEROID_SPEED   10
+#define ASTEROID_SPEED   5
 #define ASTEROID_CORNERS 9
 
 class Asteroid {

@@ -132,6 +132,67 @@ void act(float dt) {
         gameWon  = true;
     }
 
+    /// ______________________ Collisions logic _____________________________
+
+    // Laser to asteroid collisions
+    bool foundCollision = false;
+    // We go through each asteroid and laser to check for collisions
+    for (int i = 0; i < asteroids.size(); i++) {
+        for (int j = 0; j < lasers.size(); j++) {
+            if (!foundCollision)  // One collision detection per frame is enough
+            {
+                // Distance between the center of the asteroid and laser
+                double distance = pow(asteroids.at(i).GetPosition().x -
+                                          lasers.at(j).GetPosition().x,
+                                      2) +
+                                  pow(asteroids.at(i).GetPosition().y -
+                                          lasers.at(j).GetPosition().y,
+                                      2);
+                // Size of the asteroid
+                double size = asteroids.at(i).GetSize();
+
+                if (distance < size) {  // We have a collision
+
+                    // Eliminate laser
+                    lasers.erase(lasers.begin() + j);
+
+                    // Explode asteroid and create 2 new if needed
+                    if (asteroids.at(i).GetSize() > 1) {
+                        // If the asteroid's size is higher than 1, we can split
+                        // it into 2 That means creating 2 smaller asteroids and
+                        // removing this one
+                        Point2D_d cSpeed =
+                            Point2D_d(0, asteroids.at(i).GetSpeed());
+                        double speed1(asteroids.at(i).GetSpeed());
+
+                        // New asteroid 1
+
+                        Asteroid newAsteroid1(asteroids.at(i).GetPosition(),
+                                              asteroids.at(i).GetSize() / 2,
+                                              speed1);
+                        asteroids.push_back(newAsteroid1);
+
+                        // New asteroid 2
+
+                        double   speed2(-asteroids.at(i).GetSpeed());
+                        Asteroid newAsteroid2(asteroids.at(i).GetPosition(),
+                                              asteroids.at(i).GetSize() / 2,
+                                              speed2);
+                        asteroids.push_back(newAsteroid2);
+
+                        // Remove old asteroid
+                        asteroids.erase(asteroids.begin() + i);
+                    } else {
+                        // If atseroid size was 1, we set it to explosion mode
+                        asteroids.at(i).Explode();
+                    }
+
+                    foundCollision = true;
+                }
+            }
+        }
+    }
+    ///_______________________________________________________________________
 
     if (gameOver == true)
         schedule_quit_game();
