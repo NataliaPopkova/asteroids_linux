@@ -50,9 +50,6 @@ void initialize() {
 // this function is called to update game data,
 // dt - time elapsed since the previous update (in seconds)
 void act(float dt) {
-    if (is_key_pressed(VK_DOWN))
-        asteroids.back().Explode();
-
     spaceShip_logic(dt);
 
     laser_logic(dt);
