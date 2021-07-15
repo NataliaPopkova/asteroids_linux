@@ -6,23 +6,22 @@
 
 #include <stdint.h>
 
-#define SCREEN_WIDTH 1024
+#define SCREEN_WIDTH  1024
 #define SCREEN_HEIGHT 768
 
 // backbuffer
 extern uint32_t buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
 
-enum
-{
-  VK_ESCAPE,
-  VK_SPACE,
-  VK_LEFT,
-  VK_UP,
-  VK_RIGHT,
-  VK_DOWN,
-  VK_RETURN,
+enum {
+    VK_ESCAPE,
+    VK_SPACE,
+    VK_LEFT,
+    VK_UP,
+    VK_RIGHT,
+    VK_DOWN,
+    VK_RETURN,
 
-  VK__COUNT
+    VK__COUNT
 };
 
 // VK_SPACE, VK_RIGHT, VK_LEFT, VK_UP, VK_DOWN, etc.

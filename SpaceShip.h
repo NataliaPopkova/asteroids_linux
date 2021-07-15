@@ -2,6 +2,8 @@
 
 #include "GraphicPrimitives.h"
 
+#define RESISTANCE_TIMEOUT 1
+
 class SpaceShip {
 public:
     SpaceShip() = default;
@@ -26,6 +28,10 @@ public:
 
     double GetExplosionTime();
 
+    bool IsResistant();
+
+    double GetResistanceTime();
+
     Point2D_d GetPosition();
 
     double GetRotation();
@@ -44,4 +50,7 @@ private:
 
     bool   exploded_{false};
     double explosionTime_;
+
+    bool   resistant_{ false };
+    double resistanceTime_{0};
 };

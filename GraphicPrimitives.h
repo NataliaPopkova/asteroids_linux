@@ -106,9 +106,9 @@ inline void drawCircle(Point2D center, int radius, COLOR color) {
     int delta = 1 - 2 * radius;
     int error = 0;
     while (y >= 0) {
-        if ((center.y + y > radius) &&
-            (center.y + y < SCREEN_HEIGHT - radius) &&
-            (center.x + x > radius) && (center.x + x < SCREEN_WIDTH - radius)) {
+        if ((center.y + y > radius*2) &&
+            (center.y + y < SCREEN_HEIGHT - radius*2) &&
+            (center.x + x > radius*2) && (center.x + x < SCREEN_WIDTH - radius*2)) {
             buffer[center.y + y][center.x + x] = color;
             buffer[center.y - y][center.x + x] = color;
             buffer[center.y + y][center.x - x] = color;

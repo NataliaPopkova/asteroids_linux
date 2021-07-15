@@ -63,8 +63,9 @@ void SpaceShip::Reset() {
 
 void SpaceShip::Explode() {
     // Ship explodes
-    exploded_      = true;
-    explosionTime_ = 0;
+    exploded_       = true;
+    explosionTime_  = 0;
+    resistanceTime_ = 0;
 }
 
 void SpaceShip::ApplyLeftRotation(float elapsedTime) {
@@ -86,9 +87,9 @@ double SpaceShip::GetExplosionTime() {
 };
 
 void SpaceShip::ApplyAcceleration(float elapsedTime) {
-    speed_ += 0.5;
-    if (speed_ > 3) {
-        speed_ = 3;
+    speed_ += 0.1;
+    if (speed_ > 1) {
+        speed_ = 1;
     }
 }
 
@@ -101,6 +102,7 @@ void SpaceShip::Move(float elapsedTime) {
         explosionTime_ += elapsedTime;
     } else {
         if (speed_ == 0) {
+            resistanceTime_ += elapsedTime;
             return;
         }
         Point2D_d speed{0, speed_};
@@ -121,9 +123,11 @@ void SpaceShip::Move(float elapsedTime) {
             position_.y = size_;
         }
 
-        speed_ -= 0.1;
-        if (speed_ < 0) {
-            speed_ = 0;
+        speed_ += 0.5;
+        if (speed_ > 3) {
+            speed_ = 3;
+
+            resistanceTime_ += elapsedTime;
         }
     }
 }
@@ -135,3 +139,16 @@ Point2D_d SpaceShip::GetPosition() {
 double SpaceShip::GetRotation() {
     return rotation_;
 };
+
+bool SpaceShip::IsResistant() {
+    if (resistanceTime_ < RESISTANCE_TIMEOUT) {
+        resistant_ = true;
+        return resistant_;
+    }
+    resistant_ = false;
+    return resistant_;
+}
+
+double SpaceShip::GetResistanceTime() {
+    return resistanceTime_;
+}

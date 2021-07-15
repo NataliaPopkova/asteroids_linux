@@ -17,8 +17,6 @@ Asteroid::Asteroid() {
     // Initialize fixed speed_ in a random direction
     initial_rotationAngle_ = rand() % 360;
     rotate(initial_rotationAngle_, speed);
-
-    // size_ = random(ASTEROID_MAX_SIZE * (3 / 4), ASTEROID_MAX_SIZE);
 }
 
 Asteroid::Asteroid(Point2D_d newPosition, int newSize, double newSpeed)
@@ -96,4 +94,4 @@ int Asteroid::GetSize() {
 
 double Asteroid::GetExplosionTime() {
     return explosionTime_;
-}
+}     

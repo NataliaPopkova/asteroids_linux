@@ -1,11 +1,8 @@
 #include "Logic.h"
-#include "MessageDraw.h"
 
 
 // initialize game data in this function
 void initialize() {
-    std::srand(std::time(nullptr));
-
     ship = new SpaceShip();
 
     asteroids.reserve(100);
@@ -23,35 +20,51 @@ void initialize() {
 // this function is called to update game data,
 // dt - time elapsed since the previous update (in seconds)
 void act(float dt) {
-    spaceShip_logic(dt);
+    if (is_key_pressed(VK_ESCAPE))
+        schedule_quit_game();
 
-    laser_logic(dt);
+    if (!gameOver) {
+        spaceShip_logic(dt);
 
-    asteroids_logic(dt);
+        laser_logic(dt);
 
-    asteroids_laser_collision_logic(dt);
+        asteroids_logic(dt);
 
-    asteroid_ship_collision_logic(dt);
+        asteroids_laser_collision_logic(dt);
 
-    if (gameOver == true)
-        drawWin();
+        asteroid_ship_collision_logic(dt);
+    }
 }
 
 void draw() {
     // clear backbuffer
     memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
-    ship->Draw();
 
-    for (int i = 0; i < lasers.size(); i++) {
-        lasers[i].Draw();
-    }
+    if (!gameOver) {
+        drawScore(score, Point2D_d(876,10));
 
-    for (int i = 0; i < asteroids.size(); i++) {
-        asteroids[i].Draw();
-    }
+        ship->Draw();
 
-    for (int i = 0; i < lifeShips.size(); i++) {
-        lifeShips[i].Draw();
+        for (int i = 0; i < lasers.size(); i++) {
+            lasers[i].Draw();
+        }
+
+        for (int i = 0; i < asteroids.size(); i++) {
+            asteroids[i].Draw();
+        }
+
+        for (int i = 0; i < lifeShips.size(); i++) {
+            lifeShips[i].Draw();
+        }
+    } else {
+        if (gameWon == true) {
+            drawWin();
+            drawScore(score, Point2D_d(438, 514));
+        }
+        else {
+            drawLose();
+            drawScore(score, Point2D_d(438, 514));
+        }
     }
 }
 
